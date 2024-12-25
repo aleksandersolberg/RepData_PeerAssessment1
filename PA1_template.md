@@ -4,19 +4,10 @@ output:
   html_document:
     keep_md: true
 ---
-```{r, echo = FALSE, include = FALSE}
-#Set working directory
-setwd("C:/Users/aleksandso/OneDrive - nih.no/Documents/DataScience/Course_assignments/Reprodresearch/RepData_PeerAssessment1")
 
-#Load packages
-library(dplyr)
-library(ggplot2)
-
-#disable scientific notations
-options(scipen = 999)
-```
 ### Loading and preprocessing the data
-```{r}
+
+``` r
 #Load dataset
 Data <- read.csv(unz("activity.zip", "activity.csv"))
 
@@ -26,7 +17,8 @@ Data$date <- as.Date(Data$date)
 ```
 
 ### What is mean total number of steps taken per day?
-```{r echo = TRUE}
+
+``` r
 # Find number of steps per day
 daily_steps <- Data %>%
   group_by(date) %>%
@@ -36,11 +28,11 @@ daily_steps <- Data %>%
 mean_steps <- round(mean(daily_steps$daily_steps, na.rm = TRUE, digits = 0))
 median_steps <- median(daily_steps$daily_steps, na.rm = TRUE)
 ```
-The average number of steps per day was `r mean_steps` steps per day. The median number of steps per day was `r median_steps` steps per day.
+The average number of steps per day was 9354 steps per day. The median number of steps per day was 10395 steps per day.
 
 The histogram showing the total number of steps / day is seen below.
-```{r echo = TRUE}
 
+``` r
 # Create a histogram showing of daily steps
 ggplot(daily_steps, aes(x= daily_steps)) +
         geom_histogram(bins = 60, color="black", fill="lightblue", na.rm = TRUE)+
@@ -48,10 +40,13 @@ ggplot(daily_steps, aes(x= daily_steps)) +
         ylab("Frequency")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
 ### What is the average daily activity pattern?
 A time series plot showing the average daily activity pattern is included below.
 
-```{r echo = TRUE}
+
+``` r
 # Calculate average steps per interval per day
 mean_steps_by_interval <- Data %>% 
         group_by(interval) %>% 
@@ -70,8 +65,10 @@ g <- ggplot(mean_steps_by_interval, aes(x = interval, y = mean_steps_by_interval
 print(g)
 ```
 
-```{r, echo = TRUE}
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
+
+``` r
 #Find the 5 minute interval across all days which has he maximum number of steps.
 max_step_interval <- Data %>%
   arrange(desc(steps)) %>%
@@ -80,17 +77,24 @@ max_step_interval <- Data %>%
 max_step_interval
 ```
 
+```
+##   steps       date interval
+## 1   806 2012-11-27      615
+```
+
 The five minute interval with the maximum number of steps was 806 steps, which occured 27.11.2012 at interval 615. 
 
 ### Imputing missing values
-```{r echo = TRUE}
+
+``` r
 #Find and report the total number of missing values
 n_missing <- sum(is.na(Data$steps))
 ```
 
-The total number of missing values in the dataset was `r n_missing`. 
+The total number of missing values in the dataset was 2304. 
 
-```{r}
+
+``` r
 #Replace each missing value with the global mean (for simplicity).
 global_mean <- mean(Data$steps, na.rm = TRUE)
 
@@ -100,7 +104,8 @@ imputed_data <- Data %>%
 
 A new dataset with imputed data is created using the code above, and saved as imputed_data.
 
-```{r}
+
+``` r
 #Recalculate mean and median values to check for differences.
 daily_steps_imputed <- imputed_data %>%
   group_by(date) %>%
@@ -115,9 +120,10 @@ mean_diff <- round(mean_steps_imputed - mean_steps)
 median_diff <- round(median_steps_imputed - median_steps)
 ```
 
-Using imputed values, the new mean and median was `r mean_steps_imputed` and `r median_steps_imputed`. The difference in mean and median was `r mean_diff` and `r median_diff` steps per day, respectively. The histogram featuring the imputed means is included below.
+Using imputed values, the new mean and median was 10766 and 10766. The difference in mean and median was 1412 and 371 steps per day, respectively. The histogram featuring the imputed means is included below.
 
-```{r echo = TRUE}
+
+``` r
 # Create a histogram showing of daily steps
 ggplot(daily_steps_imputed, aes(x= daily_steps_imputed)) +
         geom_histogram(bins = 60, color="black", fill="lightblue", na.rm = TRUE)+
@@ -125,11 +131,14 @@ ggplot(daily_steps_imputed, aes(x= daily_steps_imputed)) +
         ylab("Frequency")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
 ### Are there differences in activity patterns between weekdays and weekends?
 
 A panel plot showing the differences in activity pattern between weekdays and weekends is included below. The plots shows slight differences in activity in weekends compared to weekdays. 
 
-```{r}
+
+``` r
 # Create factor variable with two levels: weekday and weekend
 Data <- Data %>% 
   mutate(
@@ -157,3 +166,5 @@ ggplot(average_steps, aes(x = interval, y = mean_steps)) +
   facet_wrap(~day_type, ncol = 1) +  # Panels stacked vertically
   theme_minimal()
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
